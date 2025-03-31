@@ -1,0 +1,56 @@
+<!-- templates/library/home.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Library Management System</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Books</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'book_list' %}" class="btn btn-primary">View All Books</a>
+                    <a href="{% url 'add_book' %}" class="btn btn-success">Add New Book</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Users</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'user_list' %}" class="btn btn-primary">View All Users</a>
+                    <a href="{% url 'add_student' %}" class="btn btn-success">Add New Student</a>
+                    <a href="{% url 'add_pupil' %}" class="btn btn-success">Add New Pupil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Borrowing</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'borrow_book' %}" class="btn btn-warning">Borrow a Book</a>
+                    <a href="{% url 'return_book' %}" class="btn btn-info">Return a Book</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>User Tools</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'check_user_type' %}" class="btn btn-secondary">Check User Type</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

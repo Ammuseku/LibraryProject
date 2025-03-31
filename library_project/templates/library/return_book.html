@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Return a Book</h1>
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+            {{ form.errors }}
+        </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <label for="{{ form.user_type.id_for_label }}" class="form-label">User Type</label>
+            <select name="{{ form.user_type.name }}" id="{{ form.user_type.id_for_label }}" class="form-select {% if form.user_type.errors %}is-invalid{% endif %}" required>
+                <option value="" selected disabled>Select user type</option>
+                <option value="student">Student</option>
+                <option value="pupil">Pupil</option>
+            </select>
+            {% if form.user_type.errors %}
+            <div class="invalid-feedback">
+                {{ form.user_type.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.user_id.id_for_label }}" class="form-label">User ID</label>
+            <input type="text" name="{{ form.user_id.name }}" id="{{ form.user_id.id_for_label }}" class="form-control {% if form.user_id.errors %}is-invalid{% endif %}" required>
+            {% if form.user_id.errors %}
+            <div class="invalid-feedback">
+                {{ form.user_id.errors }}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Enter the 5-digit ID of the user who is returning the book.</small>
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.book_id.id_for_label }}" class="form-label">Book ID</label>
+            <input type="number" name="{{ form.book_id.name }}" id="{{ form.book_id.id_for_label }}" class="form-control {% if form.book_id.errors %}is-invalid{% endif %}" required>
+            {% if form.book_id.errors %}
+            <div class="invalid-feedback">
+                {{ form.book_id.errors }}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Enter the ID of the book to be returned.</small>
+        </div>
+        
+        <button type="submit" class="btn btn-info">Return Book</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

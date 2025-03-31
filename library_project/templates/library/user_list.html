@@ -1,0 +1,76 @@
+<!-- templates/library/user_list.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>User List</h1>
+    <div class="row mb-3">
+        <div class="col">
+            <a href="{% url 'add_student' %}" class="btn btn-success">Add New Student</a>
+            <a href="{% url 'add_pupil' %}" class="btn btn-success">Add New Pupil</a>
+        </div>
+    </div>
+
+    <h2>Students</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Group</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.user_id }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.surname }}</td>
+                <td>{{ student.group }}</td>
+                <td>
+                    <a href="{% url 'user_books' 'student' student.user_id %}" class="btn btn-sm btn-info">View Books</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No students registered.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 class="mt-4">Pupils</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Group</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pupil in pupils %}
+            <tr>
+                <td>{{ pupil.user_id }}</td>
+                <td>{{ pupil.name }}</td>
+                <td>{{ pupil.surname }}</td>
+                <td>{{ pupil.group }}</td>
+                <td>{{ pupil.age }}</td>
+                <td>
+                    <a href="{% url 'user_books' 'pupil' pupil.user_id %}" class="btn btn-sm btn-info">View Books</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No pupils registered.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
