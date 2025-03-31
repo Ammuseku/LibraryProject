@@ -1,9 +1,10 @@
+<!-- templates/library/user_books.html (updated with edit button) -->
 {% extends 'base.html' %}
 
 {% block content %}
 <div class="container">
     <h1>Books Borrowed by {{ user }}</h1>
-    
+
     <div class="card mb-3">
         <div class="card-header">
             <h3>User Information</h3>
@@ -20,7 +21,7 @@
             {% endif %}
         </div>
     </div>
-    
+
     <h2>Borrowed Books</h2>
     {% if borrowed_books %}
     <table class="table table-striped">
@@ -31,6 +32,7 @@
                 <th>Author</th>
                 <th>ISBN</th>
                 <th>Label</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -41,6 +43,13 @@
                 <td>{{ book.author }}</td>
                 <td>{{ book.isbn }}</td>
                 <td>{{ book.get_label_display }}</td>
+                <td>
+                    {% if user.check_user_type == "This is a pupil" %}
+                    <a href="{% url 'edit_borrowing' 'pupil' user.user_id book.id %}" class="btn btn-sm btn-warning">Change Book</a>
+                    {% else %}
+                    <a href="{% url 'edit_borrowing' 'student' user.user_id book.id %}" class="btn btn-sm btn-warning">Change Book</a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -50,10 +59,10 @@
         This user has not borrowed any books.
     </div>
     {% endif %}
-    
+
     <div class="mt-3">
         <a href="{% url 'user_list' %}" class="btn btn-primary">Back to User List</a>
-        <a href="{% url 'borrow_book' %}" class="btn btn-warning">Borrow a Book</a>
+        <a href="{% url 'borrow_book' %}" class="btn btn-success">Borrow a Book</a>
         <a href="{% url 'return_book' %}" class="btn btn-info">Return a Book</a>
     </div>
 </div>

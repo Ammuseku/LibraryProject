@@ -28,15 +28,38 @@ class Library:
         if book.quantity <= 0:
             return False, "This book is not available."
 
-        if user.borrow_book(book):
-            return True, "Book borrowed successfully."
-        return False, "Failed to borrow the book."
+        from django.db import transaction
+
+        try:
+            with transaction.atomic():
+                if user.borrow_book(book):
+                    # Force a refresh from database to get updated quantity
+                    book.refresh_from_db()
+                    return True, f"Book '{book.title}' borrowed successfully. Remaining copies: {book.quantity}"
+                return False, "Failed to borrow the book."
+        except Exception as e:
+            print(f"Error during borrowing process: {str(e)}")
+            return False, f"An error occurred: {str(e)}"
 
     @staticmethod
     def process_return(user, book):
+        """Process a book return request with proper validation."""
+        # Print debug information
+        print(f"Processing return request: User {user.user_id}, Book {book.id}, Current quantity: {book.quantity}")
+
         if book not in user.borrowed_books.all():
             return False, "This user has not borrowed this book."
 
-        if user.return_book(book):
-            return True, "Book returned successfully."
-        return False, "Failed to return the book."
+        # Use Django transaction to ensure database consistency
+        from django.db import transaction
+
+        try:
+            with transaction.atomic():
+                if user.return_book(book):
+                    # Force a refresh from database to get updated quantity
+                    book.refresh_from_db()
+                    return True, f"Book '{book.title}' returned successfully. New quantity: {book.quantity}"
+                return False, "Failed to return the book."
+        except Exception as e:
+            print(f"Error during return process: {str(e)}")
+            return False, f"An error occurred: {str(e)}"

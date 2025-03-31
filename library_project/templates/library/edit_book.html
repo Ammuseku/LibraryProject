@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Book</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+            <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" value="{{ form.title.value }}" required>
+            {% if form.title.errors %}
+            <div class="invalid-feedback">
+                {{ form.title.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.author.id_for_label }}" class="form-label">Author</label>
+            <input type="text" name="{{ form.author.name }}" id="{{ form.author.id_for_label }}" class="form-control {% if form.author.errors %}is-invalid{% endif %}" value="{{ form.author.value }}" required>
+            {% if form.author.errors %}
+            <div class="invalid-feedback">
+                {{ form.author.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.isbn.id_for_label }}" class="form-label">ISBN</label>
+            <input type="text" name="{{ form.isbn.name }}" id="{{ form.isbn.id_for_label }}" class="form-control {% if form.isbn.errors %}is-invalid{% endif %}" value="{{ form.isbn.value }}" required>
+            {% if form.isbn.errors %}
+            <div class="invalid-feedback">
+                {{ form.isbn.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.year.id_for_label }}" class="form-label">Year</label>
+            <input type="number" name="{{ form.year.name }}" id="{{ form.year.id_for_label }}" class="form-control {% if form.year.errors %}is-invalid{% endif %}" value="{{ form.year.value }}" required>
+            {% if form.year.errors %}
+            <div class="invalid-feedback">
+                {{ form.year.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity</label>
+            <input type="number" name="{{ form.quantity.name }}" id="{{ form.quantity.id_for_label }}" class="form-control {% if form.quantity.errors %}is-invalid{% endif %}" value="{{ form.quantity.value }}" required>
+            {% if form.quantity.errors %}
+            <div class="invalid-feedback">
+                {{ form.quantity.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.label.id_for_label }}" class="form-label">Label</label>
+            <select name="{{ form.label.name }}" id="{{ form.label.id_for_label }}" class="form-select {% if form.label.errors %}is-invalid{% endif %}" required>
+                <option value="for children" {% if form.label.value == 'for children' %}selected{% endif %}>For Children</option>
+                <option value="general" {% if form.label.value == 'general' %}selected{% endif %}>General</option>
+            </select>
+            {% if form.label.errors %}
+            <div class="invalid-feedback">
+                {{ form.label.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Book</button>
+        <a href="{% url 'book_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

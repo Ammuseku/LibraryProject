@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h1>Delete Book</h1>
+        </div>
+        <div class="card-body">
+            <p class="alert alert-warning">Are you sure you want to delete the book "{{ book.title }}"? This action cannot be undone.</p>
+            
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3>Book Details</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Title:</strong> {{ book.title }}</p>
+                    <p><strong>Author:</strong> {{ book.author }}</p>
+                    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                    <p><strong>Year:</strong> {{ book.year }}</p>
+                    <p><strong>Quantity:</strong> {{ book.quantity }}</p>
+                    <p><strong>Label:</strong> {{ book.get_label_display }}</p>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete Book</button>
+                <a href="{% url 'book_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

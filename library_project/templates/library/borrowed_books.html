@@ -1,0 +1,111 @@
+<!-- templates/library/borrowed_books.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>All Borrowed Books</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Summary</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <strong>Total Borrowings:</strong> {{ total_borrowings }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <strong>Unique Borrowers:</strong> {{ unique_borrowers }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by user name, book title, or author...">
+    </div>
+
+    {% if borrowings %}
+    <div class="table-responsive">
+        <table class="table table-striped" id="borrowingsTable">
+            <thead>
+                <tr>
+                    <th>User Type</th>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>Group</th>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Label</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for borrowing in borrowings %}
+                <tr>
+                    <td>{{ borrowing.user_type|title }}</td>
+                    <td>{{ borrowing.user_id }}</td>
+                    <td>{{ borrowing.user_name }}</td>
+                    <td>{{ borrowing.user_group }}</td>
+                    <td>{{ borrowing.book_title }}</td>
+                    <td>{{ borrowing.book_author }}</td>
+                    <td>{{ borrowing.book_isbn }}</td>
+                    <td>{{ borrowing.book_label }}</td>
+                    <td>
+                        <a href="{% url 'user_books' borrowing.user_type borrowing.user_id %}" class="btn btn-sm btn-info">View User Books</a>
+                        <a href="{% url 'edit_borrowing' borrowing.user_type borrowing.user_id borrowing.book_id %}" class="btn btn-sm btn-warning">Change Book</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No books are currently borrowed.
+    </div>
+    {% endif %}
+
+    <div class="mt-3">
+        <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+
+<script>
+    // Simple search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.getElementById('borrowingsTable');
+        const rows = table.getElementsByTagName('tr');
+
+        searchInput.addEventListener('keyup', function() {
+            const searchText = searchInput.value.toLowerCase();
+
+            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let matchFound = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText = cells[j].textContent.toLowerCase();
+                    if (cellText.includes(searchText)) {
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if (matchFound) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

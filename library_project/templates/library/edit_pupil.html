@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Pupil</h1>
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+            {{ form.errors }}
+        </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <label for="{{ form.user_id.id_for_label }}" class="form-label">Pupil ID (must start with 1)</label>
+            <input type="text" name="{{ form.user_id.name }}" id="{{ form.user_id.id_for_label }}" class="form-control {% if form.user_id.errors %}is-invalid{% endif %}" value="{{ form.user_id.value }}" required {% if pupil.borrowed_books.exists %}readonly{% endif %}>
+            {% if form.user_id.errors %}
+            <div class="invalid-feedback">
+                {{ form.user_id.errors }}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Pupil ID must be a 5-digit number starting with 1 (10000-19999).</small>
+            {% if pupil.borrowed_books.exists %}
+            <small class="form-text text-warning">ID cannot be changed while pupil has borrowed books.</small>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+            <input type="text" name="{{ form.name.name }}" id="{{ form.name.id_for_label }}" class="form-control {% if form.name.errors %}is-invalid{% endif %}" value="{{ form.name.value }}" required>
+            {% if form.name.errors %}
+            <div class="invalid-feedback">
+                {{ form.name.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.surname.id_for_label }}" class="form-label">Surname</label>
+            <input type="text" name="{{ form.surname.name }}" id="{{ form.surname.id_for_label }}" class="form-control {% if form.surname.errors %}is-invalid{% endif %}" value="{{ form.surname.value }}" required>
+            {% if form.surname.errors %}
+            <div class="invalid-feedback">
+                {{ form.surname.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.group.id_for_label }}" class="form-label">Group</label>
+            <input type="text" name="{{ form.group.name }}" id="{{ form.group.id_for_label }}" class="form-control {% if form.group.errors %}is-invalid{% endif %}" value="{{ form.group.value }}" required>
+            {% if form.group.errors %}
+            <div class="invalid-feedback">
+                {{ form.group.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.age.id_for_label }}" class="form-label">Age</label>
+            <input type="number" name="{{ form.age.name }}" id="{{ form.age.id_for_label }}" class="form-control {% if form.age.errors %}is-invalid{% endif %}" value="{{ form.age.value }}" min="1" max="18" required>
+            {% if form.age.errors %}
+            <div class="invalid-feedback">
+                {{ form.age.errors }}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Pupils under 7 years old cannot borrow books.</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Update Pupil</button>
+        <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

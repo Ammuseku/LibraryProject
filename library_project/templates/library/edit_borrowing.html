@@ -1,0 +1,67 @@
+<!-- templates/library/edit_borrowing.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Borrowing</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>User Information</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>ID:</strong> {{ user.user_id }}</p>
+            <p><strong>Name:</strong> {{ user.name }} {{ user.surname }}</p>
+            <p><strong>Group:</strong> {{ user.group }}</p>
+            {% if user_type == 'pupil' %}
+            <p><strong>Age:</strong> {{ user.age }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Currently Borrowed Book</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Title:</strong> {{ current_book.title }}</p>
+            <p><strong>Author:</strong> {{ current_book.author }}</p>
+            <p><strong>ISBN:</strong> {{ current_book.isbn }}</p>
+            <p><strong>Label:</strong> {{ current_book.get_label_display }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Swap for Another Book</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="new_book_id" class="form-label">Select New Book</label>
+                    <select name="new_book_id" id="new_book_id" class="form-select" required>
+                        <option value="" selected disabled>-- Select a book --</option>
+                        {% for book in available_books %}
+                        <option value="{{ book.id }}">
+                            {{ book.title }} by {{ book.author }} ({{ book.get_label_display }}, {{ book.quantity }} available)
+                        </option>
+                        {% empty %}
+                        <option value="" disabled>No available books that this user can borrow</option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">
+                        {% if user_type == 'pupil' %}
+                        Note: Only books labeled "for children" are shown.
+                        {% endif %}
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Swap Book</button>
+                <a href="{% url 'user_books' user_type user.user_id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

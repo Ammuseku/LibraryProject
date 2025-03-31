@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h1>Delete Student</h1>
+        </div>
+        <div class="card-body">
+            <p class="alert alert-warning">Are you sure you want to delete the student "{{ student.name }} {{ student.surname }}"? This action cannot be undone.</p>
+            
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3>Student Details</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> {{ student.user_id }}</p>
+                    <p><strong>Name:</strong> {{ student.name }} {{ student.surname }}</p>
+                    <p><strong>Group:</strong> {{ student.group }}</p>
+                    <p><strong>Borrowed Books:</strong> {{ student.borrowed_books.count }}</p>
+                </div>
+            </div>
+            
+            {% if student.borrowed_books.exists %}
+            <div class="alert alert-danger">
+                <strong>Warning:</strong> This student has borrowed books. They must return all books before being deleted.
+            </div>
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">Back to User List</a>
+            {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete Student</button>
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -46,13 +46,20 @@ class User(models.Model):
         return False
 
     def return_book(self, book):
+        """Return a borrowed book and update its quantity."""
         if book in self.borrowed_books.all():
+            # First remove the book from the user's borrowed books
             self.borrowed_books.remove(book)
+
+            # Then update the quantity
             book.quantity += 1
             book.save()
+
+            # Debug print statement (optional, remove in production)
+            print(f"Book '{book.title}' returned. New quantity: {book.quantity}")
+
             return True
         return False
-
     def check_user_type(self):
         if self.user_id.startswith('2'):
             return "This is a student"

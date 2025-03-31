@@ -1,4 +1,4 @@
-<!-- templates/library/user_list.html -->
+<!-- templates/library/user_list.html (updated version) -->
 {% extends 'base.html' %}
 
 {% block content %}
@@ -19,6 +19,7 @@
                 <th>Name</th>
                 <th>Surname</th>
                 <th>Group</th>
+                <th>Borrowed Books</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -29,13 +30,16 @@
                 <td>{{ student.name }}</td>
                 <td>{{ student.surname }}</td>
                 <td>{{ student.group }}</td>
+                <td>{{ student.borrowed_books.count }}</td>
                 <td>
                     <a href="{% url 'user_books' 'student' student.user_id %}" class="btn btn-sm btn-info">View Books</a>
+                    <a href="{% url 'edit_student' student.user_id %}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{% url 'delete_student' student.user_id %}" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="text-center">No students registered.</td>
+                <td colspan="6" class="text-center">No students registered.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -50,6 +54,7 @@
                 <th>Surname</th>
                 <th>Group</th>
                 <th>Age</th>
+                <th>Borrowed Books</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -61,13 +66,16 @@
                 <td>{{ pupil.surname }}</td>
                 <td>{{ pupil.group }}</td>
                 <td>{{ pupil.age }}</td>
+                <td>{{ pupil.borrowed_books.count }}</td>
                 <td>
                     <a href="{% url 'user_books' 'pupil' pupil.user_id %}" class="btn btn-sm btn-info">View Books</a>
+                    <a href="{% url 'edit_pupil' pupil.user_id %}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{% url 'delete_pupil' pupil.user_id %}" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center">No pupils registered.</td>
+                <td colspan="7" class="text-center">No pupils registered.</td>
             </tr>
             {% endfor %}
         </tbody>

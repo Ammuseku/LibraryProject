@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h1>Delete Pupil</h1>
+        </div>
+        <div class="card-body">
+            <p class="alert alert-warning">Are you sure you want to delete the pupil "{{ pupil.name }} {{ pupil.surname }}"? This action cannot be undone.</p>
+            
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3>Pupil Details</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> {{ pupil.user_id }}</p>
+                    <p><strong>Name:</strong> {{ pupil.name }} {{ pupil.surname }}</p>
+                    <p><strong>Group:</strong> {{ pupil.group }}</p>
+                    <p><strong>Age:</strong> {{ pupil.age }}</p>
+                    <p><strong>Borrowed Books:</strong> {{ pupil.borrowed_books.count }}</p>
+                </div>
+            </div>
+            
+            {% if pupil.borrowed_books.exists %}
+            <div class="alert alert-danger">
+                <strong>Warning:</strong> This pupil has borrowed books. They must return all books before being deleted.
+            </div>
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">Back to User List</a>
+            {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete Pupil</button>
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
