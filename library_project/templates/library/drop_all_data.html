@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Drop All Data</h1>
+    
+    <div class="card border-danger mb-4">
+        <div class="card-header bg-danger text-white">
+            <h3>Warning: This Action Cannot Be Undone</h3>
+        </div>
+        <div class="card-body">
+            <p>You are about to delete ALL data from the library system, including:</p>
+            <ul>
+                <li>All books ({{ books_count }} books)</li>
+                <li>All students ({{ students_count }} students)</li>
+                <li>All pupils ({{ pupils_count }} pupils)</li>
+                <li>All borrowing records</li>
+            </ul>
+            
+            <p class="text-danger"><strong>This action cannot be undone unless you have a backup file.</strong></p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete All Data</button>
+                <a href="{% url 'file_management' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

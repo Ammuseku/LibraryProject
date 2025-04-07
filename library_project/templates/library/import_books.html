@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Import Books from TXT</h1>
+    
+    <div class="alert alert-info">
+    <p>Upload a text file with book information. Each line should be in one of these formats:</p>
+    <pre>title,label</pre>
+    <p>OR the extended format with all details:</p>
+    <pre>title,author,year,quantity,label</pre>
+    <p>Where label is either "for children" or "general".</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="books_file" class="form-label">Books File (.txt)</label>
+            <input type="file" name="books_file" id="books_file" class="form-control" required accept=".txt">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Import Books</button>
+        <a href="{% url 'file_management' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

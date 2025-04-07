@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>File Management</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Text File Operations</h3>
+                </div>
+                <div class="card-body">
+                    <p>Export or import books using plain text files.</p>
+                    <a href="{% url 'export_books_txt' %}" class="btn btn-primary mb-2">Export Books to TXT</a>
+                    <a href="{% url 'import_books_txt' %}" class="btn btn-success mb-2">Import Books from TXT</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Binary File Operations</h3>
+                </div>
+                <div class="card-body">
+                    <p>Serialize or deserialize the entire library system.</p>
+                    <a href="{% url 'serialize_library' %}" class="btn btn-primary mb-2">Save Library (Serialize)</a>
+                    <a href="{% url 'deserialize_library' %}" class="btn btn-success mb-2">Load Library (Deserialize)</a>
+                    <a href="{% url 'drop_all_data' %}" class="btn btn-danger mb-2">Drop All Data</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

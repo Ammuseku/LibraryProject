@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Load Library Data</h1>
+    
+    <div class="alert alert-warning">
+        <p><strong>Warning:</strong> Loading library data will import books, students, and pupils from a serialized file.</p>
+        <p>You can choose whether to clear existing data before loading.</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="library_file" class="form-label">Library File (.pkl)</label>
+            <input type="file" name="library_file" id="library_file" class="form-control" required accept=".pkl">
+        </div>
+        
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="clear_existing" value="yes" id="clear_existing" class="form-check-input">
+            <label for="clear_existing" class="form-check-label">Clear existing data before loading</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Load Library Data</button>
+        <a href="{% url 'file_management' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
