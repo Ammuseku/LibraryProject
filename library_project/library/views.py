@@ -33,7 +33,7 @@ def export_books_txt(request):
 
 
 def import_books_txt(request):
-    """Import books from a text file"""
+    """Import books from a text file with extended information"""
     if request.method == 'POST' and request.FILES.get('books_file'):
         books_file = request.FILES['books_file']
 
@@ -46,27 +46,40 @@ def import_books_txt(request):
                 continue
 
             try:
-                # Parse line format: title,label
+                # Parse line format: title,author,year,quantity,label
                 parts = line.split(',')
-                if len(parts) >= 2:
+
+                if len(parts) >= 5:  # Full format with all fields
                     title = parts[0].strip()
+                    author = parts[1].strip()
+                    year = int(parts[2].strip())
+                    quantity = int(parts[3].strip())
+                    label = parts[4].strip()
+
+                elif len(parts) >= 2:  # Basic format with just title and label
+                    title = parts[0].strip()
+                    author = "Imported Author"  # Default
+                    year = 2023  # Default
+                    quantity = 1  # Default
                     label = parts[1].strip()
+                else:
+                    continue  # Skip invalid lines
 
-                    # Make sure label is valid
-                    if label not in ['for children', 'general']:
-                        label = 'general'  # Default to general if invalid
+                # Make sure label is valid
+                if label not in ['for children', 'general']:
+                    label = 'general'  # Default to general if invalid
 
-                    # Create a new book
-                    book = Book(
-                        title=title,
-                        author="Imported Author",  # Default author
-                        isbn=f"IMP{books_created:06d}",  # Generate a unique ISBN
-                        year=2023,  # Default year
-                        quantity=1,  # Default quantity
-                        label=label
-                    )
-                    book.save()
-                    books_created += 1
+                # Create a new book
+                book = Book(
+                    title=title,
+                    author=author,
+                    isbn=f"IMP{books_created:06d}",  # Generate a unique ISBN
+                    year=year,
+                    quantity=quantity,
+                    label=label
+                )
+                book.save()
+                books_created += 1
             except Exception as e:
                 # Log the error but continue processing
                 print(f"Error importing line: {line}. Error: {str(e)}")
@@ -75,8 +88,6 @@ def import_books_txt(request):
         return redirect('book_list')
 
     return render(request, 'library/import_books.html')
-
-
 # Binary File Operations (Serialization)
 def serialize_library(request):
     """Serialize all library data to a pickle file"""
