@@ -7,6 +7,272 @@ from .forms import BookForm, StudentForm, PupilForm, BorrowForm, ReturnForm, Use
 from .library import Library
 
 
+import pickle
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+
+
+# Text File Operations
+def export_books_txt(request):
+    """Export books to a text file (books.txt)"""
+    books = Book.objects.all()
+
+    # Create text content
+    content = ""
+    for book in books:
+        content += f"{book.title},{book.label}\n"
+
+    # Create response with file
+    response = HttpResponse(content, content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename="books.txt"'
+
+    messages.success(request, f"Successfully exported {books.count()} books to books.txt")
+    return response
+
+
+def import_books_txt(request):
+    """Import books from a text file"""
+    if request.method == 'POST' and request.FILES.get('books_file'):
+        books_file = request.FILES['books_file']
+
+        # Read and process the file
+        lines = books_file.read().decode('utf-8').splitlines()
+
+        books_created = 0
+        for line in lines:
+            if not line.strip():  # Skip empty lines
+                continue
+
+            try:
+                # Parse line format: title,label
+                parts = line.split(',')
+                if len(parts) >= 2:
+                    title = parts[0].strip()
+                    label = parts[1].strip()
+
+                    # Make sure label is valid
+                    if label not in ['for children', 'general']:
+                        label = 'general'  # Default to general if invalid
+
+                    # Create a new book
+                    book = Book(
+                        title=title,
+                        author="Imported Author",  # Default author
+                        isbn=f"IMP{books_created:06d}",  # Generate a unique ISBN
+                        year=2023,  # Default year
+                        quantity=1,  # Default quantity
+                        label=label
+                    )
+                    book.save()
+                    books_created += 1
+            except Exception as e:
+                # Log the error but continue processing
+                print(f"Error importing line: {line}. Error: {str(e)}")
+
+        messages.success(request, f"Successfully imported {books_created} books.")
+        return redirect('book_list')
+
+    return render(request, 'library/import_books.html')
+
+
+# Binary File Operations (Serialization)
+def serialize_library(request):
+    """Serialize all library data to a pickle file"""
+    # Get all data
+    books = list(Book.objects.all())
+    students = list(Student.objects.all())
+    pupils = list(Pupil.objects.all())
+
+    # Serialize data
+    library_data = {
+        'books': books,
+        'students': students,
+        'pupils': pupils
+    }
+
+    # Create pickle file
+    serialized_data = pickle.dumps(library_data)
+
+    # Create response with file
+    response = HttpResponse(serialized_data, content_type='application/octet-stream')
+    response['Content-Disposition'] = 'attachment; filename="library.pkl"'
+
+    messages.success(request, "Library data serialized and downloaded successfully")
+    return response
+
+
+def deserialize_library(request):
+    """Deserialize library data from a pickle file"""
+    if request.method == 'POST' and request.FILES.get('library_file'):
+        try:
+            # Read pickle file
+            library_file = request.FILES['library_file']
+            library_data = pickle.loads(library_file.read())
+
+            # Check if we got valid data
+            if not isinstance(library_data, dict) or not all(
+                    k in library_data for k in ['books', 'students', 'pupils']):
+                messages.error(request, "Invalid library data file format")
+                return redirect('home')
+
+            # Clear existing data if option is selected
+            if request.POST.get('clear_existing') == 'yes':
+                drop_all_data(request, silent=True)
+
+            # Import books
+            books_count = 0
+            for book_obj in library_data['books']:
+                try:
+                    # Check if this book already exists
+                    existing_book = Book.objects.filter(isbn=book_obj.isbn).first()
+                    if existing_book:
+                        # Update existing book
+                        existing_book.title = book_obj.title
+                        existing_book.author = book_obj.author
+                        existing_book.year = book_obj.year
+                        existing_book.quantity = book_obj.quantity
+                        existing_book.label = book_obj.label
+                        existing_book.save()
+                    else:
+                        # Create new book
+                        book = Book(
+                            title=book_obj.title,
+                            author=book_obj.author,
+                            isbn=book_obj.isbn,
+                            year=book_obj.year,
+                            quantity=book_obj.quantity,
+                            label=book_obj.label
+                        )
+                        book.save()
+                    books_count += 1
+                except Exception as e:
+                    print(f"Error importing book: {str(e)}")
+
+            # Import students
+            students_count = 0
+            for student_obj in library_data['students']:
+                try:
+                    # Check if this student already exists
+                    existing_student = Student.objects.filter(user_id=student_obj.user_id).first()
+                    if existing_student:
+                        # Update existing student
+                        existing_student.name = student_obj.name
+                        existing_student.surname = student_obj.surname
+                        existing_student.group = student_obj.group
+                        existing_student.save()
+                    else:
+                        # Create new student
+                        student = Student(
+                            user_id=student_obj.user_id,
+                            name=student_obj.name,
+                            surname=student_obj.surname,
+                            group=student_obj.group
+                        )
+                        student.save()
+                    students_count += 1
+
+                    # Handle borrowed books
+                    if existing_student:
+                        student = existing_student
+                    else:
+                        student = Student.objects.get(user_id=student_obj.user_id)
+
+                    # Clear existing borrowed books
+                    student.borrowed_books.clear()
+
+                    # Add borrowed books
+                    for book in student_obj.borrowed_books.all():
+                        try:
+                            db_book = Book.objects.get(isbn=book.isbn)
+                            student.borrowed_books.add(db_book)
+                        except Book.DoesNotExist:
+                            print(f"Book with ISBN {book.isbn} not found")
+                except Exception as e:
+                    print(f"Error importing student: {str(e)}")
+
+            # Import pupils
+            pupils_count = 0
+            for pupil_obj in library_data['pupils']:
+                try:
+                    # Check if this pupil already exists
+                    existing_pupil = Pupil.objects.filter(user_id=pupil_obj.user_id).first()
+                    if existing_pupil:
+                        # Update existing pupil
+                        existing_pupil.name = pupil_obj.name
+                        existing_pupil.surname = pupil_obj.surname
+                        existing_pupil.group = pupil_obj.group
+                        existing_pupil.age = pupil_obj.age
+                        existing_pupil.save()
+                    else:
+                        # Create new pupil
+                        pupil = Pupil(
+                            user_id=pupil_obj.user_id,
+                            name=pupil_obj.name,
+                            surname=pupil_obj.surname,
+                            group=pupil_obj.group,
+                            age=pupil_obj.age
+                        )
+                        pupil.save()
+                    pupils_count += 1
+
+                    # Handle borrowed books
+                    if existing_pupil:
+                        pupil = existing_pupil
+                    else:
+                        pupil = Pupil.objects.get(user_id=pupil_obj.user_id)
+
+                    # Clear existing borrowed books
+                    pupil.borrowed_books.clear()
+
+                    # Add borrowed books
+                    for book in pupil_obj.borrowed_books.all():
+                        try:
+                            db_book = Book.objects.get(isbn=book.isbn)
+                            pupil.borrowed_books.add(db_book)
+                        except Book.DoesNotExist:
+                            print(f"Book with ISBN {book.isbn} not found")
+                except Exception as e:
+                    print(f"Error importing pupil: {str(e)}")
+
+            messages.success(request,
+                             f"Successfully imported {books_count} books, {students_count} students, and {pupils_count} pupils")
+            return redirect('home')
+        except Exception as e:
+            messages.error(request, f"Error deserializing library data: {str(e)}")
+            return redirect('home')
+
+    return render(request, 'library/deserialize_library.html')
+
+
+def drop_all_data(request, silent=False):
+    """Clear all library data"""
+    # Get counts for display
+    books_count = Book.objects.count()
+    students_count = Student.objects.count()
+    pupils_count = Pupil.objects.count()
+
+    if request.method == 'POST' or silent:
+        # Clear all data
+        Book.objects.all().delete()
+        Student.objects.all().delete()
+        Pupil.objects.all().delete()
+
+        if not silent:
+            messages.success(request, "All library data has been cleared")
+            return redirect('home')
+
+    return render(request, 'library/drop_all_data.html', {
+        'books_count': books_count,
+        'students_count': students_count,
+        'pupils_count': pupils_count
+    })
+# File Management Menu
+def file_management(request):
+    """Display file management options"""
+    return render(request, 'library/file_management.html')
+
 def edit_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 

@@ -31,4 +31,10 @@ urlpatterns = [
 
     # Utility URLs
     path('users/check/', views.check_user_type, name='check_user_type'),
+    path('files/', views.file_management, name='file_management'),
+    path('files/export-books-txt/', views.export_books_txt, name='export_books_txt'),
+    path('files/import-books-txt/', views.import_books_txt, name='import_books_txt'),
+    path('files/serialize-library/', views.serialize_library, name='serialize_library'),
+    path('files/deserialize-library/', views.deserialize_library, name='deserialize_library'),
+    path('files/drop-all-data/', views.drop_all_data, name='drop_all_data'),
 ]
